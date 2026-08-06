@@ -33,7 +33,14 @@ public partial class App : System.Windows.Application
             ContextMenuStrip = new Forms.ContextMenuStrip()
         };
         _tray.DoubleClick += (_, _) => ShowWindow();
-        _tray.MouseClick += (_, args) => { if (args.Button == Forms.MouseButtons.Left) ShowWindow(); };
+        _tray.MouseClick += (_, args) =>
+        {
+            if (args.Button != Forms.MouseButtons.Left) return;
+            if (_window is not null && _window.Settings.SingleClickTrayMenu)
+                _tray.ContextMenuStrip?.Show(Forms.Cursor.Position);
+            else
+                ShowWindow();
+        };
         _window.AppsChanged += (_, _) => BuildTrayMenu();
         BuildTrayMenu();
 
@@ -78,6 +85,7 @@ public partial class App : System.Windows.Application
 
     private void ExitApplication()
     {
+        if (_window is not null && !_window.ConfirmClose()) return;
         _window?.ReallyClose();
         if (_tray is not null) { _tray.Visible = false; _tray.Dispose(); }
         Shutdown();
@@ -94,7 +102,7 @@ public partial class App : System.Windows.Application
         try
         {
             var color = (MediaColor)MediaColorConverter.ConvertFromString(hex)!;
-            if (Current.Resources["Accent"] is SolidColorBrush brush) brush.Color = color;
+            Current.Resources["Accent"] = new SolidColorBrush(color);
         }
         catch { /* invalid hex falls back to the current accent */ }
     }

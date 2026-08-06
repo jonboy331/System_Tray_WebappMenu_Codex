@@ -21,19 +21,30 @@
       <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
         <StackPanel>
 
-          <TextBlock Text="GENERAL" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <TextBlock Text="GENERAL" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <TextBlock Text="Asset ID" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
           <TextBox x:Name="AssetIdBox" LostFocus="AssetIdBox_LostFocus" Margin="0,0,0,14" ToolTip="Shown in the title bar alongside this PC's name" />
-          <CheckBox x:Name="StartupCheckBox" Content="Run Orbit at Windows startup" Foreground="{StaticResource Ink}" Checked="StartupCheckBox_Toggled" Unchecked="StartupCheckBox_Toggled" Margin="0,0,0,24" />
+          <CheckBox x:Name="StartupCheckBox" Content="Run Orbit at Windows startup" Foreground="{StaticResource Ink}" Checked="StartupCheckBox_Toggled" Unchecked="StartupCheckBox_Toggled" Margin="0,0,0,10" />
+          <CheckBox x:Name="StartMaximisedCheckBox" Content="Start maximised" Foreground="{StaticResource Ink}" Checked="StartMaximisedCheckBox_Toggled" Unchecked="StartMaximisedCheckBox_Toggled" Margin="0,0,0,10" />
+          <CheckBox x:Name="SingleClickCheckBox" Content="Single click tray icon opens app menu" Foreground="{StaticResource Ink}" Checked="SingleClickCheckBox_Toggled" Unchecked="SingleClickCheckBox_Toggled" Margin="0,0,0,24" />
 
-          <TextBlock Text="MENU COLOUR" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <TextBlock Text="KIOSK MODE" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <CheckBox x:Name="HideControlsCheckBox" Content="Hide the full screen / minimize / close buttons" Foreground="{StaticResource Ink}" Checked="HideControlsCheckBox_Toggled" Unchecked="HideControlsCheckBox_Toggled" Margin="0,0,0,14" />
+          <TextBlock Text="Close password" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
+          <TextBlock x:Name="PasswordStatusText" Text="Not set — anyone can exit from the tray menu." Foreground="{StaticResource MutedInk}" FontSize="11" Margin="0,0,0,8" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+            <PasswordBox x:Name="ClosePasswordBox" Width="180" Margin="0,0,8,0" ToolTip="Leave blank and click Set to remove the password" />
+            <Button Content="Set" Click="SetPassword_Click" Background="#24483D" />
+          </StackPanel>
+
+          <TextBlock Text="MENU COLOUR" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <StackPanel x:Name="SwatchPanel" Orientation="Horizontal" Margin="0,0,0,10" />
           <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
             <TextBox x:Name="AccentHexBox" Width="140" Margin="0,0,8,0" />
             <Button Content="Apply" Click="ApplyHex_Click" Background="#24483D" />
           </StackPanel>
 
-          <TextBlock Text="ADD A WEB APP" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <TextBlock Text="ADD A WEB APP" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <Border Background="#10151D" CornerRadius="10" Padding="12" Margin="0,0,0,24">
             <StackPanel>
               <TextBox x:Name="NewName" Margin="0,0,0,8" ToolTip="Name" />
@@ -44,7 +55,7 @@
             </StackPanel>
           </Border>
 
-          <TextBlock Text="MANAGE APPS" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <TextBlock Text="MANAGE APPS" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <StackPanel x:Name="AppsListPanel" Margin="0,0,0,20" />
 
         </StackPanel>

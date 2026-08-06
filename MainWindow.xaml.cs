@@ -38,6 +38,7 @@ public partial class MainWindow : Window
 
     public event EventHandler? AppsChanged;
     public IReadOnlyList<WebAppDefinition> ConfiguredApps => _apps;
+    public AppSettings Settings => _settings;
     public bool IsFullScreen => WindowStyle == WindowStyle.None && WindowState == WindowState.Maximized && ResizeMode == ResizeMode.NoResize;
 
     public MainWindow()
@@ -47,6 +48,8 @@ public partial class MainWindow : Window
         _settings = _settingsStore.Load();
         RenderAppMenu();
         RefreshTitleStrip();
+        ApplyWindowControlVisibility();
+        if (_settings.StartMaximised) ToggleFullScreen();
     }
 
     public async void OpenApp(Guid id)
@@ -293,6 +296,18 @@ public partial class MainWindow : Window
         TitleStrip.Visibility = IsFullScreen ? Visibility.Collapsed : Visibility.Visible;
     }
 
+    private void ApplyWindowControlVisibility()
+    {
+        WindowControlsPanel.Visibility = _settings.HideWindowControls ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    public bool ConfirmClose()
+    {
+        if (string.IsNullOrEmpty(_settings.ClosePasswordHash)) return true;
+        var prompt = new PasswordPromptWindow(_settings.ClosePasswordHash) { Owner = this };
+        return prompt.ShowDialog() == true;
+    }
+
     private void FullScreen_Click(object sender, RoutedEventArgs e) => ToggleFullScreen();
     private async void Minimize_Click(object sender, RoutedEventArgs e) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); WindowState = WindowState.Minimized; }
     private async void Hide_Click(object sender, RoutedEventArgs e) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); Hide(); }
@@ -315,6 +330,7 @@ public partial class MainWindow : Window
         _settings = _settingsStore.Load();
         App.ApplyAccentColor(_settings.AccentColor);
         RefreshTitleStrip();
+        ApplyWindowControlVisibility();
         RenderAppMenu();
         RenderTabs();
         AppsChanged?.Invoke(this, EventArgs.Empty);

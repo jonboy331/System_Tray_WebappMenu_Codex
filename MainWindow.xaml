@@ -28,12 +28,12 @@
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
           <Button x:Name="AppsButton" Click="AppsButton_Click" Background="#26372F" Padding="14,8" ToolTip="Web app menu">
-            <StackPanel Orientation="Horizontal"><TextBlock Text="●" Foreground="{StaticResource Accent}" FontSize="12" Margin="0,0,8,0"/><TextBlock Text="Apps" FontWeight="SemiBold" /></StackPanel>
+            <StackPanel Orientation="Horizontal"><TextBlock Text="●" Foreground="{DynamicResource Accent}" FontSize="12" Margin="0,0,8,0"/><TextBlock Text="Apps" FontWeight="SemiBold" /></StackPanel>
           </Button>
           <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Margin="10,0">
             <StackPanel x:Name="TabsPanel" Orientation="Horizontal" VerticalAlignment="Center" />
           </ScrollViewer>
-          <StackPanel Grid.Column="2" Orientation="Horizontal">
+          <StackPanel x:Name="WindowControlsPanel" Grid.Column="2" Orientation="Horizontal">
             <Button Click="FullScreen_Click" ToolTip="Toggle full screen"><TextBlock x:Name="FullScreenGlyph" Text="□" FontSize="18" /></Button>
             <Button Click="Minimize_Click" ToolTip="Minimize to tray"><TextBlock Text="—" FontSize="18" /></Button>
             <Button Click="Hide_Click" ToolTip="Hide to tray" Background="#351F27"><TextBlock Text="×" FontSize="20" /></Button>
@@ -46,7 +46,7 @@
         <Grid x:Name="EmptyState" Background="#0B0F15">
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520">
             <Border Width="70" Height="70" Background="#18251F" CornerRadius="18" Margin="0,0,0,22">
-              <TextBlock Text="◎" Foreground="{StaticResource Accent}" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <TextBlock Text="◎" Foreground="{DynamicResource Accent}" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Border>
             <TextBlock Text="Your web workspace" Foreground="{StaticResource Ink}" FontWeight="SemiBold" FontSize="28" HorizontalAlignment="Center" />
             <TextBlock Text="Choose an app from the menu. Each one opens here and stays available as a tab above." Foreground="{StaticResource MutedInk}" FontSize="15" TextWrapping="Wrap" TextAlignment="Center" LineHeight="23" Margin="0,10,0,20" />
@@ -61,7 +61,7 @@
             <Grid>
               <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
               <StackPanel>
-                <TextBlock Text="WEB APPS" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="WEB APPS" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" />
                 <TextBlock Text="Launch menu" Foreground="{StaticResource Ink}" FontSize="22" FontWeight="SemiBold" Margin="0,4,0,14" />
               </StackPanel>
               <Button Grid.Column="1" Click="CloseDrawer_Click" Content="×" FontSize="20" VerticalAlignment="Top" />

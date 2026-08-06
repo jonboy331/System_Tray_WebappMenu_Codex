@@ -35,7 +35,7 @@
       <Setter Property="BorderBrush" Value="#303A4B" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="Padding" Value="10,8" />
-      <Setter Property="CaretBrush" Value="{StaticResource Accent}" />
+      <Setter Property="CaretBrush" Value="{DynamicResource Accent}" />
     </Style>
   </Application.Resources>
 </Application>

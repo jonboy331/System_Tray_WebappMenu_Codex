@@ -42,8 +42,46 @@ public partial class SettingsWindow : Window
         AssetIdBox.Text = _settings.AssetId;
         AccentHexBox.Text = _settings.AccentColor;
         StartupCheckBox.IsChecked = StartupManager.IsEnabled();
+        StartMaximisedCheckBox.IsChecked = _settings.StartMaximised;
+        SingleClickCheckBox.IsChecked = _settings.SingleClickTrayMenu;
+        HideControlsCheckBox.IsChecked = _settings.HideWindowControls;
+        RefreshPasswordStatus();
         BuildAccentSwatches();
         RenderAppsList();
+    }
+
+    private void StartMaximisedCheckBox_Toggled(object sender, RoutedEventArgs e)
+    {
+        _settings.StartMaximised = StartMaximisedCheckBox.IsChecked == true;
+        _settingsStore.Save(_settings);
+    }
+
+    private void SingleClickCheckBox_Toggled(object sender, RoutedEventArgs e)
+    {
+        _settings.SingleClickTrayMenu = SingleClickCheckBox.IsChecked == true;
+        _settingsStore.Save(_settings);
+    }
+
+    private void HideControlsCheckBox_Toggled(object sender, RoutedEventArgs e)
+    {
+        _settings.HideWindowControls = HideControlsCheckBox.IsChecked == true;
+        _settingsStore.Save(_settings);
+    }
+
+    private void RefreshPasswordStatus()
+    {
+        PasswordStatusText.Text = string.IsNullOrEmpty(_settings.ClosePasswordHash)
+            ? "Not set — anyone can exit from the tray menu."
+            : "A password is set and required to exit Orbit.";
+    }
+
+    private void SetPassword_Click(object sender, RoutedEventArgs e)
+    {
+        var password = ClosePasswordBox.Password;
+        _settings.ClosePasswordHash = string.IsNullOrEmpty(password) ? null : PasswordService.Hash(password);
+        _settingsStore.Save(_settings);
+        ClosePasswordBox.Clear();
+        RefreshPasswordStatus();
     }
 
     private void BuildAccentSwatches()
