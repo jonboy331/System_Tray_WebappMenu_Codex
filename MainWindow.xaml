@@ -1,0 +1,91 @@
+<Window x:Class="TrayWebApps.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Orbit" Width="1240" Height="800" MinWidth="840" MinHeight="560"
+        WindowStyle="None" ResizeMode="CanResizeWithGrip" Background="#0B0F15"
+        Closing="Window_Closing" StateChanged="Window_StateChanged">
+  <Border BorderBrush="#323C4E" BorderThickness="1" Background="#0B0F15">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="58" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="62" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Background="{StaticResource Panel}" BorderBrush="#252D3A" BorderThickness="0,0,0,1" MouseLeftButtonDown="TitleBar_Drag">
+        <Grid Margin="10,0,8,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Button x:Name="AppsButton" Click="AppsButton_Click" Background="#26372F" Padding="14,8" ToolTip="Web app menu">
+            <StackPanel Orientation="Horizontal"><TextBlock Text="●" Foreground="{StaticResource Accent}" FontSize="12" Margin="0,0,8,0"/><TextBlock Text="Apps" FontWeight="SemiBold" /></StackPanel>
+          </Button>
+          <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Margin="10,0">
+            <StackPanel x:Name="TabsPanel" Orientation="Horizontal" VerticalAlignment="Center" />
+          </ScrollViewer>
+          <StackPanel Grid.Column="2" Orientation="Horizontal">
+            <Button Click="FullScreen_Click" ToolTip="Toggle full screen"><TextBlock x:Name="FullScreenGlyph" Text="□" FontSize="18" /></Button>
+            <Button Click="Minimize_Click" ToolTip="Minimize to tray"><TextBlock Text="—" FontSize="18" /></Button>
+            <Button Click="Hide_Click" ToolTip="Hide to tray" Background="#351F27"><TextBlock Text="×" FontSize="20" /></Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="1">
+        <Grid x:Name="BrowserHost" Background="#FFFFFF" />
+        <Grid x:Name="EmptyState" Background="#0B0F15">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520">
+            <Border Width="70" Height="70" Background="#18251F" CornerRadius="18" Margin="0,0,0,22">
+              <TextBlock Text="◎" Foreground="{StaticResource Accent}" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="Your web workspace" Foreground="{StaticResource Ink}" FontWeight="SemiBold" FontSize="28" HorizontalAlignment="Center" />
+            <TextBlock Text="Choose an app from the menu. Each one opens here and stays available as a tab above." Foreground="{StaticResource MutedInk}" FontSize="15" TextWrapping="Wrap" TextAlignment="Center" LineHeight="23" Margin="0,10,0,20" />
+            <Button Click="AppsButton_Click" Background="#26372F" HorizontalAlignment="Center" Content="Open app menu" />
+          </StackPanel>
+        </Grid>
+
+        <Border x:Name="Scrim" Background="#99070A0F" Visibility="Collapsed" MouseLeftButtonDown="Scrim_Click" />
+        <Border x:Name="AppDrawer" Width="360" HorizontalAlignment="Left" Background="#171D27" BorderBrush="#313B4D" BorderThickness="0,0,1,0" Visibility="Collapsed">
+          <Grid Margin="18">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="WEB APPS" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="Launch menu" Foreground="{StaticResource Ink}" FontSize="22" FontWeight="SemiBold" Margin="0,4,0,14" />
+              </StackPanel>
+              <Button Grid.Column="1" Click="CloseDrawer_Click" Content="×" FontSize="20" VerticalAlignment="Top" />
+            </Grid>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+              <StackPanel x:Name="AppListPanel" />
+            </ScrollViewer>
+            <Border Grid.Row="2" Background="#10151D" CornerRadius="10" Padding="12" Margin="0,14,0,0">
+              <StackPanel>
+                <TextBlock Text="Add a web app" Foreground="{StaticResource Ink}" FontWeight="SemiBold" Margin="0,0,0,9" />
+                <TextBox x:Name="NewName" Margin="0,0,0,8" ToolTip="Name" />
+                <TextBox x:Name="NewUrl" Margin="0,0,0,9" ToolTip="URL" Text="https://" />
+                <Button Click="AddApp_Click" Background="#24483D" Content="＋ Add to menu" HorizontalAlignment="Stretch" />
+                <TextBlock x:Name="FormError" Foreground="#FF8D98" FontSize="12" TextWrapping="Wrap" Margin="2,8,2,0" Visibility="Collapsed" />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <Border Grid.Row="2" Background="{StaticResource Panel}" BorderBrush="#252D3A" BorderThickness="0,1,0,0">
+        <Grid Margin="12,0">
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <Button x:Name="BackButton" Click="Back_Click" IsEnabled="False" Margin="0,0,8,0"><StackPanel Orientation="Horizontal"><TextBlock Text="←" FontSize="19" Margin="0,0,8,0"/><TextBlock Text="Back" /></StackPanel></Button>
+            <Button x:Name="ReloadButton" Click="Reload_Click" IsEnabled="False" ToolTip="Reload"><TextBlock Text="↻" FontSize="18" /></Button>
+          </StackPanel>
+          <TextBlock x:Name="StatusText" Text="No app open" Foreground="{StaticResource MutedInk}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Button x:Name="CloseTabButton" Click="CloseTab_Click" IsEnabled="False" Background="#351F27" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal"><TextBlock Text="×" FontSize="18" Margin="0,0,8,0"/><TextBlock Text="Close current" /></StackPanel>
+          </Button>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</Window>
