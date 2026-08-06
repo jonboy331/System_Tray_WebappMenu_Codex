@@ -1,6 +1,10 @@
 using System.Drawing;
 using System.Windows;
+using TrayWebApps.Services;
 using Forms = System.Windows.Forms;
+using MediaColor = System.Windows.Media.Color;
+using MediaColorConverter = System.Windows.Media.ColorConverter;
+using SolidColorBrush = System.Windows.Media.SolidColorBrush;
 
 namespace TrayWebApps;
 
@@ -17,6 +21,7 @@ public partial class App : System.Windows.Application
             System.Windows.MessageBox.Show(args.Exception.Message, "Orbit", MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
+        ApplyAccentColor(new SettingsStore().Load().AccentColor);
         _window = new MainWindow();
         MainWindow = _window;
 
@@ -82,6 +87,16 @@ public partial class App : System.Windows.Application
     {
         _tray?.Dispose();
         base.OnExit(e);
+    }
+
+    public static void ApplyAccentColor(string hex)
+    {
+        try
+        {
+            var color = (MediaColor)MediaColorConverter.ConvertFromString(hex)!;
+            if (Current.Resources["Accent"] is SolidColorBrush brush) brush.Color = color;
+        }
+        catch { /* invalid hex falls back to the current accent */ }
     }
 
     private static Icon CreateTrayIcon()

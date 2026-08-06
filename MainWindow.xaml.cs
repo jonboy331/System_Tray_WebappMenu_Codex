@@ -1,10 +1,12 @@
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using TrayWebApps.Models;
 using TrayWebApps.Services;
 using Brush = System.Windows.Media.Brush;
@@ -12,7 +14,9 @@ using Brushes = System.Windows.Media.Brushes;
 using Button = System.Windows.Controls.Button;
 using Color = System.Windows.Media.Color;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
+using Image = System.Windows.Controls.Image;
 using MessageBox = System.Windows.MessageBox;
+using Orientation = System.Windows.Controls.Orientation;
 
 namespace TrayWebApps;
 
@@ -20,9 +24,14 @@ public partial class MainWindow : Window
 {
     // The composition control participates in WPF rendering, allowing drawers and
     // other app chrome to appear above the browser surface.
-    private sealed record OpenTab(WebAppDefinition Definition, WebView2CompositionControl Browser);
+    private sealed record OpenTab(WebAppDefinition Definition, WebView2CompositionControl Browser)
+    {
+        public BitmapImage? Preview { get; set; }
+    }
     private readonly AppStore _store = new();
-    private readonly List<WebAppDefinition> _apps;
+    private readonly SettingsStore _settingsStore = new();
+    private List<WebAppDefinition> _apps;
+    private AppSettings _settings;
     private readonly List<OpenTab> _tabs = [];
     private OpenTab? _activeTab;
     private bool _reallyClose;
@@ -35,7 +44,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _apps = _store.Load();
+        _settings = _settingsStore.Load();
         RenderAppMenu();
+        RefreshTitleStrip();
     }
 
     public async void OpenApp(Guid id)
@@ -70,8 +81,9 @@ public partial class MainWindow : Window
         ActivateTab(tab);
     }
 
-    private void ActivateTab(OpenTab tab)
+    private async void ActivateTab(OpenTab tab)
     {
+        if (_activeTab is not null && _activeTab != tab) await CapturePreviewAsync(_activeTab);
         _activeTab = tab;
         foreach (var item in _tabs) item.Browser.Visibility = item == tab ? Visibility.Visible : Visibility.Collapsed;
         EmptyState.Visibility = Visibility.Collapsed;
@@ -82,15 +94,39 @@ public partial class MainWindow : Window
         tab.Browser.Focus();
     }
 
+    private static async Task CapturePreviewAsync(OpenTab tab)
+    {
+        if (tab.Browser.CoreWebView2 is not { } core) return;
+        try
+        {
+            using var stream = new MemoryStream();
+            await core.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, stream);
+            stream.Position = 0;
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.StreamSource = stream;
+            image.EndInit();
+            image.Freeze();
+            tab.Preview = image;
+        }
+        catch { /* preview capture is best-effort */ }
+    }
+
     private void RenderTabs()
     {
         TabsPanel.Children.Clear();
         foreach (var tab in _tabs)
         {
+            var content = new StackPanel { Orientation = Orientation.Horizontal };
+            content.Children.Add(BuildTabThumbnail(tab));
+            content.Children.Add(new TextBlock { Text = tab.Definition.Name, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0) });
+
             var button = new Button
             {
-                Content = tab.Definition.Name,
+                Content = content,
                 Tag = tab,
+                Padding = new Thickness(6, 5, 12, 5),
                 Margin = new Thickness(0, 0, 6, 0),
                 Background = tab == _activeTab ? new SolidColorBrush(Color.FromRgb(45, 68, 61)) : Brushes.Transparent,
                 FontWeight = tab == _activeTab ? FontWeights.SemiBold : FontWeights.Normal
@@ -119,7 +155,15 @@ public partial class MainWindow : Window
             row.ColumnDefinitions.Add(new ColumnDefinition());
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var launch = new Button { Tag = app, HorizontalContentAlignment = HorizontalAlignment.Left, Padding = new Thickness(12), ToolTip = app.Url };
-            launch.Content = new StackPanel { Children = { new TextBlock { Text = app.Name, FontWeight = FontWeights.SemiBold }, new TextBlock { Text = ShortUrl(app.Url), Foreground = (Brush)FindResource("MutedInk"), FontSize = 11, Margin = new Thickness(0, 3, 0, 0) } } };
+
+            var textStack = new StackPanel { Children = { new TextBlock { Text = app.Name, FontWeight = FontWeights.SemiBold }, new TextBlock { Text = ShortUrl(app.Url), Foreground = (Brush)FindResource("MutedInk"), FontSize = 11, Margin = new Thickness(0, 3, 0, 0) } } };
+            var rowStack = new StackPanel { Orientation = Orientation.Horizontal };
+            var icon = TryLoadIcon(app, 28);
+            FrameworkElement iconElement = icon is not null ? icon : BuildFallbackIcon(app);
+            rowStack.Children.Add(iconElement);
+            rowStack.Children.Add(textStack);
+            launch.Content = rowStack;
+
             launch.Click += (_, _) => OpenApp(((WebAppDefinition)launch.Tag).Id);
             var remove = new Button { Content = "×", Tag = app, ToolTip = "Remove from menu", Foreground = new SolidColorBrush(Color.FromRgb(255, 141, 152)) };
             remove.Click += RemoveApp_Click;
@@ -140,25 +184,71 @@ public partial class MainWindow : Window
         }
     }
 
+    private static Border BuildTabThumbnail(OpenTab tab)
+    {
+        var border = new Border
+        {
+            Width = 44,
+            Height = 28,
+            CornerRadius = new CornerRadius(4),
+            ClipToBounds = true,
+            Background = new SolidColorBrush(Color.FromRgb(10, 14, 20))
+        };
+        if (tab.Preview is not null)
+        {
+            border.Child = new Image { Source = tab.Preview, Stretch = Stretch.UniformToFill };
+        }
+        else if (TryLoadIcon(tab.Definition, 16) is { } icon)
+        {
+            icon.Margin = new Thickness(0);
+            border.Child = icon;
+        }
+        else
+        {
+            border.Child = new TextBlock { Text = "◎", Foreground = Brushes.Gray, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        }
+        return border;
+    }
+
+    private static Image? TryLoadIcon(WebAppDefinition app, double size)
+    {
+        if (string.IsNullOrWhiteSpace(app.IconPath) || !File.Exists(app.IconPath)) return null;
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.UriSource = new Uri(app.IconPath, UriKind.Absolute);
+            bitmap.EndInit();
+            return new Image { Source = bitmap, Width = size, Height = size, Margin = new Thickness(0, 0, 8, 0) };
+        }
+        catch { return null; }
+    }
+
+    private Border BuildFallbackIcon(WebAppDefinition app)
+    {
+        return new Border
+        {
+            Width = 28,
+            Height = 28,
+            CornerRadius = new CornerRadius(6),
+            Background = (Brush)FindResource("Accent"),
+            Margin = new Thickness(0, 0, 8, 0),
+            Child = new TextBlock
+            {
+                Text = app.Name.Length > 0 ? app.Name[0].ToString().ToUpperInvariant() : "?",
+                Foreground = Brushes.Black,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                FontWeight = FontWeights.Bold
+            }
+        };
+    }
+
     private static string ShortUrl(string url)
     {
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri)) return uri.Host.Replace("www.", "");
         return url;
-    }
-
-    private void AddApp_Click(object sender, RoutedEventArgs e)
-    {
-        var name = NewName.Text.Trim();
-        var url = NewUrl.Text.Trim();
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || (uri.Scheme != "https" && uri.Scheme != "http") || string.IsNullOrWhiteSpace(name))
-        {
-            FormError.Text = "Enter a name and a full http:// or https:// address.";
-            FormError.Visibility = Visibility.Visible;
-            return;
-        }
-        _apps.Add(new WebAppDefinition { Name = name, Url = uri.ToString() });
-        _store.Save(_apps); NewName.Clear(); NewUrl.Text = "https://"; FormError.Visibility = Visibility.Collapsed;
-        RenderAppMenu(); AppsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void RemoveApp_Click(object sender, RoutedEventArgs e)
@@ -191,18 +281,42 @@ public partial class MainWindow : Window
         {
             WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize; WindowState = WindowState.Maximized; FullScreenGlyph.Text = "❐";
         }
+        TitleStrip.Visibility = IsFullScreen ? Visibility.Collapsed : Visibility.Visible;
         AppsChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    private void RefreshTitleStrip()
+    {
+        var info = Environment.MachineName;
+        if (!string.IsNullOrWhiteSpace(_settings.AssetId)) info += $"   •   Asset: {_settings.AssetId}";
+        SystemInfoText.Text = info;
+        TitleStrip.Visibility = IsFullScreen ? Visibility.Collapsed : Visibility.Visible;
+    }
+
     private void FullScreen_Click(object sender, RoutedEventArgs e) => ToggleFullScreen();
-    private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
-    private void Hide_Click(object sender, RoutedEventArgs e) => Hide();
+    private async void Minimize_Click(object sender, RoutedEventArgs e) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); WindowState = WindowState.Minimized; }
+    private async void Hide_Click(object sender, RoutedEventArgs e) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); Hide(); }
     private void AppsButton_Click(object sender, RoutedEventArgs e) { AppDrawer.Visibility = Visibility.Visible; Scrim.Visibility = Visibility.Visible; }
     private void CloseDrawer_Click(object sender, RoutedEventArgs e) => CloseDrawer();
     private void Scrim_Click(object sender, MouseButtonEventArgs e) => CloseDrawer();
     private void CloseDrawer() { AppDrawer.Visibility = Visibility.Collapsed; Scrim.Visibility = Visibility.Collapsed; }
     private void TitleBar_Drag(object sender, MouseButtonEventArgs e) { if (e.LeftButton == MouseButtonState.Pressed && !IsFullScreen) DragMove(); }
-    private void Window_StateChanged(object? sender, EventArgs e) { if (WindowState == WindowState.Minimized) Hide(); }
-    private void Window_Closing(object? sender, CancelEventArgs e) { if (!_reallyClose) { e.Cancel = true; Hide(); } }
+    private async void Window_StateChanged(object? sender, EventArgs e) { if (WindowState == WindowState.Minimized) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); Hide(); } }
+    private void Window_Closing(object? sender, CancelEventArgs e) { if (!_reallyClose) { e.Cancel = true; HideWithPreview(); } }
+    private async void HideWithPreview() { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); Hide(); }
     public void ReallyClose() { _reallyClose = true; Close(); }
+
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        CloseDrawer();
+        var settingsWindow = new SettingsWindow { Owner = this };
+        settingsWindow.ShowDialog();
+        _apps = _store.Load();
+        _settings = _settingsStore.Load();
+        App.ApplyAccentColor(_settings.AccentColor);
+        RefreshTitleStrip();
+        RenderAppMenu();
+        RenderTabs();
+        AppsChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

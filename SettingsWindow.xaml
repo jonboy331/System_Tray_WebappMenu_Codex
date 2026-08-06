@@ -1,0 +1,54 @@
+<Window x:Class="TrayWebApps.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Orbit Settings" Width="480" Height="720" MinWidth="420" MinHeight="480"
+        WindowStyle="None" ResizeMode="CanResizeWithGrip" Background="#0B0F15"
+        WindowStartupLocation="CenterOwner">
+  <Border BorderBrush="#323C4E" BorderThickness="1" Background="#0B0F15">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="48" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Background="{StaticResource Panel}" BorderBrush="#252D3A" BorderThickness="0,0,0,1" MouseLeftButtonDown="TitleBar_Drag">
+        <Grid Margin="16,0">
+          <TextBlock Text="Settings" Foreground="{StaticResource Ink}" FontWeight="SemiBold" FontSize="16" VerticalAlignment="Center" />
+          <Button Content="×" FontSize="18" HorizontalAlignment="Right" Click="Close_Click" />
+        </Grid>
+      </Border>
+
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel>
+
+          <TextBlock Text="GENERAL" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <TextBlock Text="Asset ID" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
+          <TextBox x:Name="AssetIdBox" LostFocus="AssetIdBox_LostFocus" Margin="0,0,0,14" ToolTip="Shown in the title bar alongside this PC's name" />
+          <CheckBox x:Name="StartupCheckBox" Content="Run Orbit at Windows startup" Foreground="{StaticResource Ink}" Checked="StartupCheckBox_Toggled" Unchecked="StartupCheckBox_Toggled" Margin="0,0,0,24" />
+
+          <TextBlock Text="MENU COLOUR" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <StackPanel x:Name="SwatchPanel" Orientation="Horizontal" Margin="0,0,0,10" />
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+            <TextBox x:Name="AccentHexBox" Width="140" Margin="0,0,8,0" />
+            <Button Content="Apply" Click="ApplyHex_Click" Background="#24483D" />
+          </StackPanel>
+
+          <TextBlock Text="ADD A WEB APP" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <Border Background="#10151D" CornerRadius="10" Padding="12" Margin="0,0,0,24">
+            <StackPanel>
+              <TextBox x:Name="NewName" Margin="0,0,0,8" ToolTip="Name" />
+              <TextBox x:Name="NewUrl" Margin="0,0,0,9" ToolTip="URL" Text="https://" />
+              <Button Click="AddApp_Click" Background="#24483D" Content="＋ Add to menu" HorizontalAlignment="Stretch" />
+              <TextBlock x:Name="FormError" Foreground="#FF8D98" FontSize="12" TextWrapping="Wrap" Margin="2,8,2,0" Visibility="Collapsed" />
+              <TextBlock Text="An icon is fetched automatically from the site. You can override it below." Foreground="{StaticResource MutedInk}" FontSize="11" TextWrapping="Wrap" Margin="2,8,2,0" />
+            </StackPanel>
+          </Border>
+
+          <TextBlock Text="MANAGE APPS" Foreground="{StaticResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <StackPanel x:Name="AppsListPanel" Margin="0,0,0,20" />
+
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Border>
+</Window>
