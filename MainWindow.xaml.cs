@@ -68,6 +68,8 @@ public partial class MainWindow : Window
         BrowserHost.Children.Add(browser);
         browser.NavigationStarting += (_, _) => { if (_activeTab == tab) StatusText.Text = $"Loading {definition.Name}…"; };
         browser.NavigationCompleted += (_, _) => UpdateNavigation();
+        ActivateTab(tab);
+        StatusText.Text = $"Loading {definition.Name}…";
         try
         {
             await browser.EnsureCoreWebView2Async();
@@ -80,7 +82,6 @@ public partial class MainWindow : Window
         {
             MessageBox.Show(this, $"Could not start the embedded browser.\n\n{ex.Message}\n\nInstall the Microsoft Edge WebView2 Runtime if it is not already installed.", "Orbit", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-        ActivateTab(tab);
     }
 
     private async void ActivateTab(OpenTab tab)
