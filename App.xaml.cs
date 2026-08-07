@@ -44,10 +44,8 @@ public partial class App : System.Windows.Application
         _window.AppsChanged += (_, _) => BuildTrayMenu();
         BuildTrayMenu();
 
-        if (e.Args.Contains("--show", StringComparer.OrdinalIgnoreCase))
-            ShowWindow();
-        else
-            _tray.ShowBalloonTip(2000, "Orbit is ready", "Open a web app from the tray menu.", Forms.ToolTipIcon.None);
+        ShowWindow();
+        if (_window.Settings.StartMaximised && !_window.IsFullScreen) _window.ToggleFullScreen();
     }
 
     private void BuildTrayMenu()

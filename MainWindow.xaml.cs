@@ -49,7 +49,6 @@ public partial class MainWindow : Window
         RenderAppMenu();
         RefreshTitleStrip();
         ApplyWindowControlVisibility();
-        if (_settings.StartMaximised) ToggleFullScreen();
     }
 
     public async void OpenApp(Guid id)
