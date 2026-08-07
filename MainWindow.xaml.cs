@@ -59,11 +59,20 @@ public partial class MainWindow : Window
         var definition = _apps.FirstOrDefault(a => a.Id == id);
         if (definition is null) return;
 
-        var browser = new WebView2CompositionControl
+        WebView2CompositionControl browser;
+        try
         {
-            Visibility = Visibility.Collapsed,
-            CreationProperties = new CoreWebView2CreationProperties()
-        };
+            browser = new WebView2CompositionControl
+            {
+                Visibility = Visibility.Collapsed,
+                CreationProperties = new CoreWebView2CreationProperties()
+            };
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, $"Could not start the embedded browser.\n\n{ex.Message}\n\nInstall the Microsoft Edge WebView2 Runtime if it is not already installed.", "Orbit", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
         var tab = new OpenTab(definition, browser);
         _tabs.Add(tab);
         BrowserHost.Children.Add(browser);
