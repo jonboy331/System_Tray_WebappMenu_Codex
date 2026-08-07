@@ -25,7 +25,8 @@
           <TextBlock Text="Asset ID" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
           <TextBox x:Name="AssetIdBox" LostFocus="AssetIdBox_LostFocus" Margin="0,0,0,14" ToolTip="Shown in the title bar alongside this PC's name" />
           <CheckBox x:Name="StartupCheckBox" Content="Run Orbit at Windows startup" Foreground="{StaticResource Ink}" Checked="StartupCheckBox_Toggled" Unchecked="StartupCheckBox_Toggled" Margin="0,0,0,10" />
-          <CheckBox x:Name="StartMaximisedCheckBox" Content="Start maximised" Foreground="{StaticResource Ink}" Checked="StartMaximisedCheckBox_Toggled" Unchecked="StartMaximisedCheckBox_Toggled" Margin="0,0,0,24" />
+          <CheckBox x:Name="StartMaximisedCheckBox" Content="Start maximised" Foreground="{StaticResource Ink}" Checked="StartMaximisedCheckBox_Toggled" Unchecked="StartMaximisedCheckBox_Toggled" Margin="0,0,0,10" />
+          <CheckBox x:Name="AlwaysOnTopCheckBox" Content="Always on top" Foreground="{StaticResource Ink}" Checked="AlwaysOnTopCheckBox_Toggled" Unchecked="AlwaysOnTopCheckBox_Toggled" Margin="0,0,0,24" />
 
           <TextBlock Text="KIOSK MODE" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <CheckBox x:Name="HideControlsCheckBox" Content="Hide the full screen / minimize / close buttons" Foreground="{StaticResource Ink}" Checked="HideControlsCheckBox_Toggled" Unchecked="HideControlsCheckBox_Toggled" Margin="0,0,0,14" />
@@ -35,6 +36,23 @@
             <PasswordBox x:Name="ClosePasswordBox" Width="180" Margin="0,0,8,0" ToolTip="Leave blank and click Set to remove the password" />
             <Button Content="Set" Click="SetPassword_Click" Background="#24483D" />
           </StackPanel>
+
+          <TextBlock Text="FLOATING WIDGET" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
+          <CheckBox x:Name="StartAsWidgetCheckBox" Content="Start as a floating widget" Foreground="{StaticResource Ink}" Checked="StartAsWidgetCheckBox_Toggled" Unchecked="StartAsWidgetCheckBox_Toggled" Margin="0,0,0,14" />
+          <TextBlock Text="Widget text" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
+          <TextBox x:Name="WidgetTextBox" LostFocus="WidgetTextBox_LostFocus" Margin="0,0,0,10" />
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <StackPanel Margin="0,0,14,0">
+              <TextBlock Text="Width" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
+              <TextBox x:Name="WidgetWidthBox" Width="70" LostFocus="WidgetSizeBox_LostFocus" />
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Text="Height" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
+              <TextBox x:Name="WidgetHeightBox" Width="70" LostFocus="WidgetSizeBox_LostFocus" />
+            </StackPanel>
+          </StackPanel>
+          <CheckBox x:Name="WidgetLockCheckBox" Content="Lock widget position" Foreground="{StaticResource Ink}" Checked="WidgetLockCheckBox_Toggled" Unchecked="WidgetLockCheckBox_Toggled" Margin="0,0,0,6" />
+          <TextBlock Text="While unlocked, drag the widget to reposition it. Once locked, clicking it opens the menu instead." Foreground="{StaticResource MutedInk}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,24" />
 
           <TextBlock Text="MENU COLOUR" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <StackPanel x:Name="SwatchPanel" Orientation="Horizontal" Margin="0,0,0,10" />

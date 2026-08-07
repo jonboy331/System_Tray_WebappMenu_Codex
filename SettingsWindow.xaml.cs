@@ -43,7 +43,13 @@ public partial class SettingsWindow : Window
         AccentHexBox.Text = _settings.AccentColor;
         StartupCheckBox.IsChecked = StartupManager.IsEnabled();
         StartMaximisedCheckBox.IsChecked = _settings.StartMaximised;
+        AlwaysOnTopCheckBox.IsChecked = _settings.AlwaysOnTop;
         HideControlsCheckBox.IsChecked = _settings.HideWindowControls;
+        StartAsWidgetCheckBox.IsChecked = _settings.StartAsWidget;
+        WidgetTextBox.Text = _settings.WidgetText;
+        WidgetWidthBox.Text = _settings.WidgetWidth.ToString("0");
+        WidgetHeightBox.Text = _settings.WidgetHeight.ToString("0");
+        WidgetLockCheckBox.IsChecked = _settings.WidgetLocked;
         RefreshPasswordStatus();
         BuildAccentSwatches();
         RenderAppsList();
@@ -58,6 +64,41 @@ public partial class SettingsWindow : Window
     private void HideControlsCheckBox_Toggled(object sender, RoutedEventArgs e)
     {
         _settings.HideWindowControls = HideControlsCheckBox.IsChecked == true;
+        _settingsStore.Save(_settings);
+    }
+
+    private void AlwaysOnTopCheckBox_Toggled(object sender, RoutedEventArgs e)
+    {
+        _settings.AlwaysOnTop = AlwaysOnTopCheckBox.IsChecked == true;
+        _settingsStore.Save(_settings);
+    }
+
+    private void StartAsWidgetCheckBox_Toggled(object sender, RoutedEventArgs e)
+    {
+        _settings.StartAsWidget = StartAsWidgetCheckBox.IsChecked == true;
+        _settingsStore.Save(_settings);
+    }
+
+    private void WidgetTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        _settings.WidgetText = string.IsNullOrWhiteSpace(WidgetTextBox.Text) ? "Apps" : WidgetTextBox.Text.Trim();
+        _settingsStore.Save(_settings);
+    }
+
+    private void WidgetSizeBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (double.TryParse(WidgetWidthBox.Text, out var width) && width >= 60) _settings.WidgetWidth = width;
+        else WidgetWidthBox.Text = _settings.WidgetWidth.ToString("0");
+
+        if (double.TryParse(WidgetHeightBox.Text, out var height) && height >= 32) _settings.WidgetHeight = height;
+        else WidgetHeightBox.Text = _settings.WidgetHeight.ToString("0");
+
+        _settingsStore.Save(_settings);
+    }
+
+    private void WidgetLockCheckBox_Toggled(object sender, RoutedEventArgs e)
+    {
+        _settings.WidgetLocked = WidgetLockCheckBox.IsChecked == true;
         _settingsStore.Save(_settings);
     }
 

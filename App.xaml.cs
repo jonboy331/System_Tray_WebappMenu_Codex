@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Interop;
 using TrayWebApps.Services;
 using Forms = System.Windows.Forms;
 using MediaColor = System.Windows.Media.Color;
@@ -14,12 +15,14 @@ public partial class App : System.Windows.Application
 {
     private Forms.NotifyIcon? _tray;
     private MainWindow? _window;
+    private WidgetWindow? _widgetWindow;
     private Mutex? _singleInstanceMutex;
+    private readonly SettingsStore _settingsStore = new();
 
     [DllImport("user32.dll")] private static extern IntPtr FindWindow(string? lpClassName, string lpWindowName);
-    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
-    [DllImport("user32.dll", EntryPoint = "ShowWindow")] private static extern bool NativeShowWindow(IntPtr hWnd, int nCmdShow);
-    private const int SW_RESTORE = 9;
+    [DllImport("user32.dll")] private static extern bool PostMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")] private static extern int RegisterWindowMessage(string lpString);
+    private static readonly int ShowRequestMessage = RegisterWindowMessage("OrbitWebApps.ShowRequest");
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -29,7 +32,7 @@ public partial class App : System.Windows.Application
         if (!isNewInstance)
         {
             var existing = FindWindow(null, "Orbit");
-            if (existing != IntPtr.Zero) { NativeShowWindow(existing, SW_RESTORE); SetForegroundWindow(existing); }
+            if (existing != IntPtr.Zero) PostMessage(existing, ShowRequestMessage, IntPtr.Zero, IntPtr.Zero);
             Shutdown();
             return;
         }
@@ -39,9 +42,11 @@ public partial class App : System.Windows.Application
             System.Windows.MessageBox.Show(args.Exception.Message, "Orbit", MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
-        ApplyAccentColor(new SettingsStore().Load().AccentColor);
+        ApplyAccentColor(_settingsStore.Load().AccentColor);
         _window = new MainWindow();
         MainWindow = _window;
+        var windowHandle = new WindowInteropHelper(_window).EnsureHandle();
+        HwndSource.FromHwnd(windowHandle)?.AddHook(WndProc);
 
         _tray = new Forms.NotifyIcon
         {
@@ -53,10 +58,28 @@ public partial class App : System.Windows.Application
         _tray.DoubleClick += (_, _) => ShowWindow();
         _tray.MouseClick += (_, args) => { if (args.Button == Forms.MouseButtons.Left) ShowWindow(); };
         _window.AppsChanged += (_, _) => BuildTrayMenu();
+        _window.MinimizeToWidgetRequested += (_, _) => ShowWidget();
         BuildTrayMenu();
 
-        ShowWindow();
-        if (_window.Settings.StartMaximised && !_window.IsFullScreen) _window.ToggleFullScreen();
+        if (_window.Settings.StartAsWidget)
+        {
+            ShowWidget();
+        }
+        else
+        {
+            ShowWindow();
+            if (_window.Settings.StartMaximised && !_window.IsFullScreen) _window.ToggleFullScreen();
+        }
+    }
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == ShowRequestMessage)
+        {
+            ShowWindow();
+            handled = true;
+        }
+        return IntPtr.Zero;
     }
 
     private void BuildTrayMenu()
@@ -84,17 +107,34 @@ public partial class App : System.Windows.Application
     private void ShowWindow()
     {
         if (_window is null) return;
+        _widgetWindow?.Hide();
         _window.Show();
         if (_window.WindowState == WindowState.Minimized) _window.WindowState = WindowState.Normal;
         _window.Activate();
+        var alwaysOnTop = _window.Settings.AlwaysOnTop;
         _window.Topmost = true;
-        _window.Topmost = false;
+        if (!alwaysOnTop) _window.Topmost = false;
         _window.Focus();
+    }
+
+    private void ShowWidget()
+    {
+        if (_window is null) return;
+        _window.Hide();
+        _widgetWindow?.Close();
+        _widgetWindow = new WidgetWindow(_window.Settings, _settingsStore);
+        _widgetWindow.OpenMenuRequested += (_, _) =>
+        {
+            ShowWindow();
+            _window?.OpenDrawer();
+        };
+        _widgetWindow.Show();
     }
 
     public void ExitApplication()
     {
         if (_window is not null && !_window.ConfirmClose()) return;
+        _widgetWindow?.Close();
         _window?.ReallyClose();
         if (_tray is not null) { _tray.Visible = false; _tray.Dispose(); }
         Shutdown();

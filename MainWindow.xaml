@@ -38,6 +38,9 @@
             <Button Click="Minimize_Click" ToolTip="Minimize to tray"><TextBlock Text="—" FontSize="18" /></Button>
             <Button Click="Hide_Click" ToolTip="Hide to tray" Background="#351F27"><TextBlock Text="×" FontSize="20" /></Button>
           </StackPanel>
+          <StackPanel x:Name="WidgetControlsPanel" Grid.Column="2" Orientation="Horizontal" Visibility="Collapsed">
+            <Button Click="MinimizeToWidget_Click" ToolTip="Minimize to floating widget"><TextBlock Text="—" FontSize="18" /></Button>
+          </StackPanel>
         </Grid>
       </Border>
 

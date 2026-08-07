@@ -37,6 +37,7 @@ public partial class MainWindow : Window
     private bool _reallyClose;
 
     public event EventHandler? AppsChanged;
+    public event EventHandler? MinimizeToWidgetRequested;
     public IReadOnlyList<WebAppDefinition> ConfiguredApps => _apps;
     public AppSettings Settings => _settings;
     public bool IsFullScreen => WindowStyle == WindowStyle.None && WindowState == WindowState.Maximized && ResizeMode == ResizeMode.NoResize;
@@ -298,11 +299,18 @@ public partial class MainWindow : Window
 
     private void ApplyWindowControlVisibility()
     {
-        WindowControlsPanel.Visibility = _settings.HideWindowControls ? Visibility.Collapsed : Visibility.Visible;
-        KioskCloseButton.Visibility = _settings.HideWindowControls ? Visibility.Visible : Visibility.Collapsed;
+        var kiosk = _settings.HideWindowControls;
+        var widgetMode = _settings.StartAsWidget && !kiosk;
+        WindowControlsPanel.Visibility = !kiosk && !widgetMode ? Visibility.Visible : Visibility.Collapsed;
+        WidgetControlsPanel.Visibility = widgetMode ? Visibility.Visible : Visibility.Collapsed;
+        KioskCloseButton.Visibility = kiosk ? Visibility.Visible : Visibility.Collapsed;
+        Topmost = _settings.AlwaysOnTop;
     }
 
     private void KioskClose_Click(object sender, RoutedEventArgs e) => (System.Windows.Application.Current as App)?.ExitApplication();
+    private void MinimizeToWidget_Click(object sender, RoutedEventArgs e) => MinimizeToWidgetRequested?.Invoke(this, EventArgs.Empty);
+
+    public void OpenDrawer() { AppDrawer.Visibility = Visibility.Visible; Scrim.Visibility = Visibility.Visible; }
 
     public bool ConfirmClose()
     {
@@ -314,7 +322,7 @@ public partial class MainWindow : Window
     private void FullScreen_Click(object sender, RoutedEventArgs e) => ToggleFullScreen();
     private async void Minimize_Click(object sender, RoutedEventArgs e) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); WindowState = WindowState.Minimized; }
     private async void Hide_Click(object sender, RoutedEventArgs e) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); Hide(); }
-    private void AppsButton_Click(object sender, RoutedEventArgs e) { AppDrawer.Visibility = Visibility.Visible; Scrim.Visibility = Visibility.Visible; }
+    private void AppsButton_Click(object sender, RoutedEventArgs e) => OpenDrawer();
     private void CloseDrawer_Click(object sender, RoutedEventArgs e) => CloseDrawer();
     private void Scrim_Click(object sender, MouseButtonEventArgs e) => CloseDrawer();
     private void CloseDrawer() { AppDrawer.Visibility = Visibility.Collapsed; Scrim.Visibility = Visibility.Collapsed; }
@@ -337,5 +345,6 @@ public partial class MainWindow : Window
         RenderAppMenu();
         RenderTabs();
         AppsChanged?.Invoke(this, EventArgs.Empty);
+        if (_settings.StartAsWidget) MinimizeToWidgetRequested?.Invoke(this, EventArgs.Empty);
     }
 }
