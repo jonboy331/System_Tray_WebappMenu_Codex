@@ -43,7 +43,6 @@ public partial class SettingsWindow : Window
         AccentHexBox.Text = _settings.AccentColor;
         StartupCheckBox.IsChecked = StartupManager.IsEnabled();
         StartMaximisedCheckBox.IsChecked = _settings.StartMaximised;
-        SingleClickCheckBox.IsChecked = _settings.SingleClickTrayMenu;
         HideControlsCheckBox.IsChecked = _settings.HideWindowControls;
         RefreshPasswordStatus();
         BuildAccentSwatches();
@@ -53,12 +52,6 @@ public partial class SettingsWindow : Window
     private void StartMaximisedCheckBox_Toggled(object sender, RoutedEventArgs e)
     {
         _settings.StartMaximised = StartMaximisedCheckBox.IsChecked == true;
-        _settingsStore.Save(_settings);
-    }
-
-    private void SingleClickCheckBox_Toggled(object sender, RoutedEventArgs e)
-    {
-        _settings.SingleClickTrayMenu = SingleClickCheckBox.IsChecked == true;
         _settingsStore.Save(_settings);
     }
 

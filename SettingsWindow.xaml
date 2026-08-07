@@ -25,8 +25,7 @@
           <TextBlock Text="Asset ID" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
           <TextBox x:Name="AssetIdBox" LostFocus="AssetIdBox_LostFocus" Margin="0,0,0,14" ToolTip="Shown in the title bar alongside this PC's name" />
           <CheckBox x:Name="StartupCheckBox" Content="Run Orbit at Windows startup" Foreground="{StaticResource Ink}" Checked="StartupCheckBox_Toggled" Unchecked="StartupCheckBox_Toggled" Margin="0,0,0,10" />
-          <CheckBox x:Name="StartMaximisedCheckBox" Content="Start maximised" Foreground="{StaticResource Ink}" Checked="StartMaximisedCheckBox_Toggled" Unchecked="StartMaximisedCheckBox_Toggled" Margin="0,0,0,10" />
-          <CheckBox x:Name="SingleClickCheckBox" Content="Single click tray icon opens app menu" Foreground="{StaticResource Ink}" Checked="SingleClickCheckBox_Toggled" Unchecked="SingleClickCheckBox_Toggled" Margin="0,0,0,24" />
+          <CheckBox x:Name="StartMaximisedCheckBox" Content="Start maximised" Foreground="{StaticResource Ink}" Checked="StartMaximisedCheckBox_Toggled" Unchecked="StartMaximisedCheckBox_Toggled" Margin="0,0,0,24" />
 
           <TextBlock Text="KIOSK MODE" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <CheckBox x:Name="HideControlsCheckBox" Content="Hide the full screen / minimize / close buttons" Foreground="{StaticResource Ink}" Checked="HideControlsCheckBox_Toggled" Unchecked="HideControlsCheckBox_Toggled" Margin="0,0,0,14" />

@@ -1,4 +1,6 @@
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using TrayWebApps.Services;
 using Forms = System.Windows.Forms;
@@ -12,10 +14,26 @@ public partial class App : System.Windows.Application
 {
     private Forms.NotifyIcon? _tray;
     private MainWindow? _window;
+    private Mutex? _singleInstanceMutex;
+
+    [DllImport("user32.dll")] private static extern IntPtr FindWindow(string? lpClassName, string lpWindowName);
+    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll", EntryPoint = "ShowWindow")] private static extern bool NativeShowWindow(IntPtr hWnd, int nCmdShow);
+    private const int SW_RESTORE = 9;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        _singleInstanceMutex = new Mutex(true, "OrbitWebApps.SingleInstance", out var isNewInstance);
+        if (!isNewInstance)
+        {
+            var existing = FindWindow(null, "Orbit");
+            if (existing != IntPtr.Zero) { NativeShowWindow(existing, SW_RESTORE); SetForegroundWindow(existing); }
+            Shutdown();
+            return;
+        }
+
         DispatcherUnhandledException += (_, args) =>
         {
             System.Windows.MessageBox.Show(args.Exception.Message, "Orbit", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -33,14 +51,7 @@ public partial class App : System.Windows.Application
             ContextMenuStrip = new Forms.ContextMenuStrip()
         };
         _tray.DoubleClick += (_, _) => ShowWindow();
-        _tray.MouseClick += (_, args) =>
-        {
-            if (args.Button != Forms.MouseButtons.Left) return;
-            if (_window is not null && _window.Settings.SingleClickTrayMenu)
-                _tray.ContextMenuStrip?.Show(Forms.Cursor.Position);
-            else
-                ShowWindow();
-        };
+        _tray.MouseClick += (_, args) => { if (args.Button == Forms.MouseButtons.Left) ShowWindow(); };
         _window.AppsChanged += (_, _) => BuildTrayMenu();
         BuildTrayMenu();
 
@@ -81,7 +92,7 @@ public partial class App : System.Windows.Application
         _window.Focus();
     }
 
-    private void ExitApplication()
+    public void ExitApplication()
     {
         if (_window is not null && !_window.ConfirmClose()) return;
         _window?.ReallyClose();

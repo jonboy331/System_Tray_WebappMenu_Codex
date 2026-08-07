@@ -69,12 +69,24 @@
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
               <StackPanel x:Name="AppListPanel" />
             </ScrollViewer>
-            <Button Grid.Row="2" Click="SettingsButton_Click" Background="#1B2230" HorizontalAlignment="Stretch" Margin="0,14,0,0">
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="⚙" FontSize="15" Margin="0,0,8,0" />
-                <TextBlock Text="Settings" FontWeight="SemiBold" />
-              </StackPanel>
-            </Button>
+            <Grid Grid.Row="2" Margin="0,14,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Button Grid.Column="0" Click="SettingsButton_Click" Background="#1B2230" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                  <TextBlock Text="⚙" FontSize="15" Margin="0,0,8,0" />
+                  <TextBlock Text="Settings" FontWeight="SemiBold" />
+                </StackPanel>
+              </Button>
+              <Button x:Name="KioskCloseButton" Grid.Column="1" Click="KioskClose_Click" Background="#351F27" Margin="8,0,0,0" Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="×" FontSize="15" Margin="0,0,6,0" />
+                  <TextBlock Text="Close" FontWeight="SemiBold" />
+                </StackPanel>
+              </Button>
+            </Grid>
           </Grid>
         </Border>
       </Grid>

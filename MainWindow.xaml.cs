@@ -298,7 +298,10 @@ public partial class MainWindow : Window
     private void ApplyWindowControlVisibility()
     {
         WindowControlsPanel.Visibility = _settings.HideWindowControls ? Visibility.Collapsed : Visibility.Visible;
+        KioskCloseButton.Visibility = _settings.HideWindowControls ? Visibility.Visible : Visibility.Collapsed;
     }
+
+    private void KioskClose_Click(object sender, RoutedEventArgs e) => (System.Windows.Application.Current as App)?.ExitApplication();
 
     public bool ConfirmClose()
     {
