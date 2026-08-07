@@ -24,7 +24,7 @@ public partial class MainWindow : Window
 {
     // The composition control participates in WPF rendering, allowing drawers and
     // other app chrome to appear above the browser surface.
-    private sealed record OpenTab(WebAppDefinition Definition, WebView2CompositionControl Browser)
+    private sealed record OpenTab(WebAppDefinition Definition, WebView2 Browser)
     {
         public BitmapImage? Preview { get; set; }
     }
@@ -59,10 +59,10 @@ public partial class MainWindow : Window
         var definition = _apps.FirstOrDefault(a => a.Id == id);
         if (definition is null) return;
 
-        WebView2CompositionControl browser;
+        WebView2 browser;
         try
         {
-            browser = new WebView2CompositionControl
+            browser = new WebView2
             {
                 Visibility = Visibility.Collapsed,
                 CreationProperties = new CoreWebView2CreationProperties()
@@ -319,7 +319,12 @@ public partial class MainWindow : Window
     private void KioskClose_Click(object sender, RoutedEventArgs e) => (System.Windows.Application.Current as App)?.ExitApplication();
     private void MinimizeToWidget_Click(object sender, RoutedEventArgs e) => MinimizeToWidgetRequested?.Invoke(this, EventArgs.Empty);
 
-    public void OpenDrawer() { AppDrawer.Visibility = Visibility.Visible; Scrim.Visibility = Visibility.Visible; }
+    public void OpenDrawer()
+    {
+        if (_activeTab is not null) _activeTab.Browser.Visibility = Visibility.Collapsed;
+        AppDrawer.Visibility = Visibility.Visible;
+        Scrim.Visibility = Visibility.Visible;
+    }
 
     public bool ConfirmClose()
     {
@@ -334,7 +339,12 @@ public partial class MainWindow : Window
     private void AppsButton_Click(object sender, RoutedEventArgs e) => OpenDrawer();
     private void CloseDrawer_Click(object sender, RoutedEventArgs e) => CloseDrawer();
     private void Scrim_Click(object sender, MouseButtonEventArgs e) => CloseDrawer();
-    private void CloseDrawer() { AppDrawer.Visibility = Visibility.Collapsed; Scrim.Visibility = Visibility.Collapsed; }
+    private void CloseDrawer()
+    {
+        AppDrawer.Visibility = Visibility.Collapsed;
+        Scrim.Visibility = Visibility.Collapsed;
+        if (_activeTab is not null) _activeTab.Browser.Visibility = Visibility.Visible;
+    }
     private void TitleBar_Drag(object sender, MouseButtonEventArgs e) { if (e.LeftButton == MouseButtonState.Pressed && !IsFullScreen) DragMove(); }
     private async void Window_StateChanged(object? sender, EventArgs e) { if (WindowState == WindowState.Minimized) { if (_activeTab is not null) await CapturePreviewAsync(_activeTab); Hide(); } }
     private void Window_Closing(object? sender, CancelEventArgs e) { if (!_reallyClose) { e.Cancel = true; HideWithPreview(); } }
