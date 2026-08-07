@@ -36,4 +36,13 @@ public static class FaviconService
         File.Copy(sourceFilePath, path, overwrite: true);
         return path;
     }
+
+    public static string CopyWidgetImage(string sourceFilePath)
+    {
+        Directory.CreateDirectory(IconDir);
+        var extension = Path.GetExtension(sourceFilePath) is { Length: > 0 } ext ? ext : ".png";
+        var path = Path.Combine(IconDir, $"widget-image{extension}");
+        File.Copy(sourceFilePath, path, overwrite: true);
+        return path;
+    }
 }

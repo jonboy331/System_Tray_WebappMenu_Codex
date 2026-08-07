@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Orbit" Width="1240" Height="800" MinWidth="840" MinHeight="560"
         WindowStyle="None" ResizeMode="CanResizeWithGrip" Background="#0B0F15"
+        Icon="Assets/AppIcon.ico"
         Closing="Window_Closing" StateChanged="Window_StateChanged">
   <Border BorderBrush="#323C4E" BorderThickness="1" Background="#0B0F15">
     <Grid>

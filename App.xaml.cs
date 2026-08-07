@@ -126,7 +126,8 @@ public partial class App : System.Windows.Application
         _widgetWindow.OpenMenuRequested += (_, _) =>
         {
             ShowWindow();
-            _window?.OpenDrawer();
+            if (_window!.Settings.StartMaximised && !_window.IsFullScreen) _window.ToggleFullScreen();
+            _window.OpenDrawer();
         };
         _widgetWindow.Show();
     }
@@ -156,17 +157,10 @@ public partial class App : System.Windows.Application
         catch { /* invalid hex falls back to the current accent */ }
     }
 
-    private static Icon CreateTrayIcon()
+    private Icon CreateTrayIcon()
     {
-        using var bitmap = new Bitmap(32, 32);
-        using var graphics = Graphics.FromImage(bitmap);
-        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-        graphics.Clear(Color.Transparent);
-        using var dark = new SolidBrush(Color.FromArgb(20, 25, 34));
-        using var mint = new SolidBrush(Color.FromArgb(120, 227, 197));
-        graphics.FillEllipse(dark, 1, 1, 30, 30);
-        graphics.FillEllipse(mint, 7, 7, 18, 18);
-        graphics.FillEllipse(dark, 12, 12, 8, 8);
-        return Icon.FromHandle(bitmap.GetHicon());
+        var uri = new Uri("pack://application:,,,/Assets/AppIcon.ico");
+        using var stream = GetResourceStream(uri)!.Stream;
+        return new Icon(stream);
     }
 }

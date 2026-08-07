@@ -50,6 +50,7 @@ public partial class SettingsWindow : Window
         WidgetWidthBox.Text = _settings.WidgetWidth.ToString("0");
         WidgetHeightBox.Text = _settings.WidgetHeight.ToString("0");
         WidgetLockCheckBox.IsChecked = _settings.WidgetLocked;
+        RefreshWidgetImagePreview();
         RefreshPasswordStatus();
         BuildAccentSwatches();
         RenderAppsList();
@@ -100,6 +101,38 @@ public partial class SettingsWindow : Window
     {
         _settings.WidgetLocked = WidgetLockCheckBox.IsChecked == true;
         _settingsStore.Save(_settings);
+    }
+
+    private void RefreshWidgetImagePreview()
+    {
+        WidgetImagePreview.Source = null;
+        if (string.IsNullOrWhiteSpace(_settings.WidgetImagePath) || !File.Exists(_settings.WidgetImagePath)) return;
+        try
+        {
+            var bitmap = new System.Windows.Media.Imaging.BitmapImage();
+            bitmap.BeginInit();
+            bitmap.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+            bitmap.UriSource = new Uri(_settings.WidgetImagePath, UriKind.Absolute);
+            bitmap.EndInit();
+            WidgetImagePreview.Source = bitmap;
+        }
+        catch { /* leave preview empty */ }
+    }
+
+    private void ChooseWidgetImage_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog { Filter = "Images|*.png;*.ico;*.jpg;*.jpeg;*.bmp" };
+        if (dialog.ShowDialog(this) != true) return;
+        _settings.WidgetImagePath = FaviconService.CopyWidgetImage(dialog.FileName);
+        _settingsStore.Save(_settings);
+        RefreshWidgetImagePreview();
+    }
+
+    private void ClearWidgetImage_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.WidgetImagePath = null;
+        _settingsStore.Save(_settings);
+        RefreshWidgetImagePreview();
     }
 
     private void RefreshPasswordStatus()

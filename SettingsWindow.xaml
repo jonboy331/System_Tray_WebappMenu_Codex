@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Orbit Settings" Width="480" Height="720" MinWidth="420" MinHeight="480"
         WindowStyle="None" ResizeMode="CanResizeWithGrip" Background="#0B0F15"
+        Icon="Assets/AppIcon.ico"
         WindowStartupLocation="CenterOwner">
   <Border BorderBrush="#323C4E" BorderThickness="1" Background="#0B0F15">
     <Grid>
@@ -52,7 +53,15 @@
             </StackPanel>
           </StackPanel>
           <CheckBox x:Name="WidgetLockCheckBox" Content="Lock widget position" Foreground="{StaticResource Ink}" Checked="WidgetLockCheckBox_Toggled" Unchecked="WidgetLockCheckBox_Toggled" Margin="0,0,0,6" />
-          <TextBlock Text="While unlocked, drag the widget to reposition it. Once locked, clicking it opens the menu instead." Foreground="{StaticResource MutedInk}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,24" />
+          <TextBlock Text="While unlocked, drag the widget to reposition it. Once locked, clicking it opens the menu instead." Foreground="{StaticResource MutedInk}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14" />
+          <TextBlock Text="Widget image (optional, shown above the text)" Foreground="{StaticResource MutedInk}" FontSize="12" Margin="0,0,0,6" />
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+            <Border Width="32" Height="32" Background="#10151D" CornerRadius="6" Margin="0,0,8,0">
+              <Image x:Name="WidgetImagePreview" Stretch="Uniform" Margin="4" />
+            </Border>
+            <Button Content="Choose image" Click="ChooseWidgetImage_Click" Margin="0,0,8,0" />
+            <Button Content="Clear" Click="ClearWidgetImage_Click" />
+          </StackPanel>
 
           <TextBlock Text="MENU COLOUR" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10" />
           <StackPanel x:Name="SwatchPanel" Orientation="Horizontal" Margin="0,0,0,10" />

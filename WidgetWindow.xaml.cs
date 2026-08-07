@@ -1,5 +1,7 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using TrayWebApps.Models;
 using TrayWebApps.Services;
 
@@ -21,6 +23,21 @@ public partial class WidgetWindow : Window
         Width = Math.Max(60, settings.WidgetWidth);
         Height = Math.Max(32, settings.WidgetHeight);
         WidgetLabel.Text = settings.WidgetText;
+
+        if (!string.IsNullOrWhiteSpace(settings.WidgetImagePath) && File.Exists(settings.WidgetImagePath))
+        {
+            try
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.UriSource = new Uri(settings.WidgetImagePath, UriKind.Absolute);
+                bitmap.EndInit();
+                WidgetImage.Source = bitmap;
+                WidgetImage.Visibility = Visibility.Visible;
+            }
+            catch { /* fall back to text-only widget */ }
+        }
 
         var workArea = SystemParameters.WorkArea;
         Left = settings.WidgetX ?? workArea.Right - Width - 40;
