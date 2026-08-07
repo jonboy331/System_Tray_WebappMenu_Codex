@@ -96,7 +96,7 @@ public partial class MainWindow : Window
 
     private async void ActivateTab(OpenTab tab)
     {
-        if (_activeTab is not null && _activeTab != tab) await CapturePreviewAsync(_activeTab);
+        var previous = _activeTab;
         _activeTab = tab;
         foreach (var item in _tabs) item.Browser.Visibility = item == tab ? Visibility.Visible : Visibility.Collapsed;
         EmptyState.Visibility = Visibility.Collapsed;
@@ -105,6 +105,11 @@ public partial class MainWindow : Window
         UpdateNavigation();
         CloseDrawer();
         tab.Browser.Focus();
+        if (previous is not null && previous != tab)
+        {
+            await CapturePreviewAsync(previous);
+            RenderTabs();
+        }
     }
 
     private static async Task CapturePreviewAsync(OpenTab tab)
