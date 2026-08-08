@@ -243,6 +243,24 @@ public partial class MainWindow : Window
                 Margin = new Thickness(4, 10, 4, 18)
             });
         }
+        UpdateAppListScrollArrows();
+    }
+
+    private void AppListScrollUp_Click(object sender, RoutedEventArgs e) =>
+        AppListScrollViewer.ScrollToVerticalOffset(Math.Max(0, AppListScrollViewer.VerticalOffset - 140));
+
+    private void AppListScrollDown_Click(object sender, RoutedEventArgs e) =>
+        AppListScrollViewer.ScrollToVerticalOffset(Math.Min(AppListScrollViewer.ScrollableHeight, AppListScrollViewer.VerticalOffset + 140));
+
+    private void AppListScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e) => UpdateAppListScrollArrows();
+
+    private void UpdateAppListScrollArrows()
+    {
+        var canScroll = AppListScrollViewer.ScrollableHeight > 0.5;
+        AppListScrollUpButton.Visibility = canScroll ? Visibility.Visible : Visibility.Collapsed;
+        AppListScrollDownButton.Visibility = canScroll ? Visibility.Visible : Visibility.Collapsed;
+        AppListScrollUpButton.IsEnabled = AppListScrollViewer.VerticalOffset > 0.5;
+        AppListScrollDownButton.IsEnabled = AppListScrollViewer.VerticalOffset < AppListScrollViewer.ScrollableHeight - 0.5;
     }
 
     private static Border BuildTabThumbnail(OpenTab tab)

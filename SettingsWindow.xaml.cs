@@ -237,37 +237,58 @@ public partial class SettingsWindow : Window
     private void RenderAppsList()
     {
         AppsListPanel.Children.Clear();
-        foreach (var app in _apps)
+        for (var i = 0; i < _apps.Count; i++)
         {
+            var app = _apps[i];
             var row = new Grid { Margin = new Thickness(0, 0, 0, 8) };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.ColumnDefinitions.Add(new ColumnDefinition());
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
+            var reorder = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 0) };
+            var moveUp = new Button { Content = "▲", Tag = app, FontSize = 9, Padding = new Thickness(6, 2, 6, 2), IsEnabled = i > 0 };
+            var moveDown = new Button { Content = "▼", Tag = app, FontSize = 9, Padding = new Thickness(6, 2, 6, 2), Margin = new Thickness(0, 2, 0, 0), IsEnabled = i < _apps.Count - 1 };
+            moveUp.Click += (_, _) => MoveApp(app, -1);
+            moveDown.Click += (_, _) => MoveApp(app, 1);
+            reorder.Children.Add(moveUp); reorder.Children.Add(moveDown);
+            Grid.SetColumn(reorder, 0);
+
             var loadedIcon = TryLoadIcon(app);
             FrameworkElement icon = loadedIcon is not null ? (FrameworkElement)loadedIcon : BuildFallbackIcon(app);
-            Grid.SetColumn(icon, 0);
+            Grid.SetColumn(icon, 1);
 
             var textStack = new StackPanel { Margin = new Thickness(10, 0, 10, 0), VerticalAlignment = VerticalAlignment.Center };
             textStack.Children.Add(new TextBlock { Text = app.Name, FontWeight = FontWeights.SemiBold, Foreground = (Brush)FindResource("Ink") });
             textStack.Children.Add(new TextBlock { Text = app.Url, FontSize = 11, Foreground = (Brush)FindResource("MutedInk"), TextTrimming = TextTrimming.CharacterEllipsis });
-            Grid.SetColumn(textStack, 1);
+            Grid.SetColumn(textStack, 2);
 
             var changeIcon = new Button { Content = "Change icon", Tag = app, FontSize = 11 };
             changeIcon.Click += ChangeIcon_Click;
-            Grid.SetColumn(changeIcon, 2);
+            Grid.SetColumn(changeIcon, 3);
 
             var setPin = new Button { Content = string.IsNullOrEmpty(app.PinHash) ? "Set PIN" : "PIN set ✓", Tag = app, FontSize = 11, Margin = new Thickness(6, 0, 0, 0) };
             setPin.Click += SetPin_Click;
-            Grid.SetColumn(setPin, 3);
+            Grid.SetColumn(setPin, 4);
 
-            row.Children.Add(icon); row.Children.Add(textStack); row.Children.Add(changeIcon); row.Children.Add(setPin);
+            row.Children.Add(reorder); row.Children.Add(icon); row.Children.Add(textStack); row.Children.Add(changeIcon); row.Children.Add(setPin);
             AppsListPanel.Children.Add(row);
         }
 
         if (_apps.Count == 0)
             AppsListPanel.Children.Add(new TextBlock { Text = "No web apps yet.", Foreground = (Brush)FindResource("MutedInk"), Margin = new Thickness(0, 4, 0, 4) });
+    }
+
+    private void MoveApp(WebAppDefinition app, int direction)
+    {
+        var index = _apps.IndexOf(app);
+        var newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= _apps.Count) return;
+        _apps.RemoveAt(index);
+        _apps.Insert(newIndex, app);
+        _store.Save(_apps);
+        RenderAppsList();
     }
 
     private void SetPin_Click(object sender, RoutedEventArgs e)

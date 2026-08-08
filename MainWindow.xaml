@@ -31,8 +31,8 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
-          <Button x:Name="AppsButton" Grid.Column="0" Click="AppsButton_Click" Background="#26372F" Padding="14,8" ToolTip="Web app menu" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
-            <StackPanel Orientation="Horizontal"><TextBlock Text="●" Foreground="{DynamicResource Accent}" FontSize="12" Margin="0,0,8,0"/><TextBlock Text="Apps" FontWeight="SemiBold" /></StackPanel>
+          <Button x:Name="AppsButton" Grid.Column="0" Click="AppsButton_Click" Background="{DynamicResource Accent}" Padding="14,8" ToolTip="Web app menu" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
+            <TextBlock Text="Apps" FontWeight="SemiBold" Foreground="Black" />
           </Button>
           <Button x:Name="CubeButton" Grid.Column="1" Click="CubeButton_Click" ToolTip="Toggle compact tab icons" Width="40" Height="40" Padding="0" Margin="8,0,0,0" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
             <TextBlock Text="▦" FontSize="17" />
@@ -75,19 +75,23 @@
           <Grid Margin="18">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <Grid>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
               <StackPanel>
                 <TextBlock Text="WEB APPS" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" />
                 <TextBlock Text="Launch menu" Foreground="{StaticResource Ink}" FontSize="22" FontWeight="SemiBold" Margin="0,4,0,14" />
               </StackPanel>
-              <Button Grid.Column="1" Click="CloseDrawer_Click" Content="×" FontSize="20" VerticalAlignment="Top" />
+              <Button x:Name="AppListScrollUpButton" Grid.Column="1" Click="AppListScrollUp_Click" ToolTip="Scroll up" Width="40" Height="40" Padding="0" Margin="0,0,8,0" VerticalAlignment="Top" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Visibility="Collapsed">
+                <TextBlock Text="▲" FontSize="14" />
+              </Button>
+              <Button Grid.Column="2" Click="CloseDrawer_Click" Content="×" FontSize="20" VerticalAlignment="Top" />
             </Grid>
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="AppListScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Hidden" ScrollChanged="AppListScrollViewer_ScrollChanged">
               <StackPanel x:Name="AppListPanel" />
             </ScrollViewer>
             <Grid Grid.Row="2" Margin="0,14,0,0">
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
               <Button Grid.Column="0" Click="SettingsButton_Click" Background="#1B2230" HorizontalAlignment="Stretch">
@@ -96,7 +100,10 @@
                   <TextBlock Text="Settings" FontWeight="SemiBold" />
                 </StackPanel>
               </Button>
-              <Button x:Name="KioskCloseButton" Grid.Column="1" Click="KioskClose_Click" Background="#351F27" Margin="8,0,0,0" Visibility="Collapsed">
+              <Button x:Name="AppListScrollDownButton" Grid.Column="1" Click="AppListScrollDown_Click" ToolTip="Scroll down" Width="40" Height="40" Padding="0" Margin="8,0,0,0" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Visibility="Collapsed">
+                <TextBlock Text="▼" FontSize="14" />
+              </Button>
+              <Button x:Name="KioskCloseButton" Grid.Column="2" Click="KioskClose_Click" Background="#351F27" Margin="8,0,0,0" Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal">
                   <TextBlock Text="×" FontSize="15" Margin="0,0,6,0" />
                   <TextBlock Text="Close" FontWeight="SemiBold" />
