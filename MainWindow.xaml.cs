@@ -35,6 +35,7 @@ public partial class MainWindow : Window
     private readonly List<OpenTab> _tabs = [];
     private OpenTab? _activeTab;
     private bool _reallyClose;
+    private bool _compactTabs;
 
     public event EventHandler? AppsChanged;
     public event EventHandler? MinimizeToWidgetRequested;
@@ -141,15 +142,13 @@ public partial class MainWindow : Window
         TabsPanel.Children.Clear();
         foreach (var tab in _tabs)
         {
-            var content = new StackPanel { Orientation = Orientation.Horizontal };
-            content.Children.Add(BuildTabThumbnail(tab));
-            content.Children.Add(new TextBlock { Text = tab.Definition.Name, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0) });
-
+            FrameworkElement content = _compactTabs ? BuildTabIcon(tab) : BuildTabFullContent(tab);
             var button = new Button
             {
                 Content = content,
                 Tag = tab,
-                Padding = new Thickness(6, 5, 12, 5),
+                ToolTip = tab.Definition.Name,
+                Padding = _compactTabs ? new Thickness(8, 6, 8, 6) : new Thickness(6, 5, 12, 5),
                 Margin = new Thickness(0, 0, 6, 0),
                 Background = tab == _activeTab ? new SolidColorBrush(Color.FromRgb(45, 68, 61)) : Brushes.Transparent,
                 FontWeight = tab == _activeTab ? FontWeights.SemiBold : FontWeights.Normal
@@ -157,6 +156,45 @@ public partial class MainWindow : Window
             button.Click += (_, _) => ActivateTab((OpenTab)button.Tag);
             TabsPanel.Children.Add(button);
         }
+        UpdateTabScrollArrows();
+    }
+
+    private static FrameworkElement BuildTabFullContent(OpenTab tab)
+    {
+        var content = new StackPanel { Orientation = Orientation.Horizontal };
+        content.Children.Add(BuildTabThumbnail(tab));
+        content.Children.Add(new TextBlock { Text = tab.Definition.Name, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0) });
+        return content;
+    }
+
+    private static FrameworkElement BuildTabIcon(OpenTab tab)
+    {
+        if (TryLoadIcon(tab.Definition, 24) is { } icon) { icon.Margin = new Thickness(0); return icon; }
+        return new TextBlock { Text = "◎", Foreground = Brushes.Gray, FontSize = 16, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+    }
+
+    private void CubeButton_Click(object sender, RoutedEventArgs e)
+    {
+        _compactTabs = !_compactTabs;
+        CubeButton.Background = _compactTabs ? new SolidColorBrush(Color.FromRgb(45, 68, 61)) : Brushes.Transparent;
+        RenderTabs();
+    }
+
+    private void ScrollTabsLeft_Click(object sender, RoutedEventArgs e) =>
+        TabsScrollViewer.ScrollToHorizontalOffset(Math.Max(0, TabsScrollViewer.HorizontalOffset - 200));
+
+    private void ScrollTabsRight_Click(object sender, RoutedEventArgs e) =>
+        TabsScrollViewer.ScrollToHorizontalOffset(Math.Min(TabsScrollViewer.ScrollableWidth, TabsScrollViewer.HorizontalOffset + 200));
+
+    private void TabsScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e) => UpdateTabScrollArrows();
+
+    private void UpdateTabScrollArrows()
+    {
+        var canScroll = TabsScrollViewer.ScrollableWidth > 0.5;
+        TabsScrollLeftButton.Visibility = canScroll ? Visibility.Visible : Visibility.Collapsed;
+        TabsScrollRightButton.Visibility = canScroll ? Visibility.Visible : Visibility.Collapsed;
+        TabsScrollLeftButton.IsEnabled = TabsScrollViewer.HorizontalOffset > 0.5;
+        TabsScrollRightButton.IsEnabled = TabsScrollViewer.HorizontalOffset < TabsScrollViewer.ScrollableWidth - 0.5;
     }
 
     private void UpdateNavigation()
