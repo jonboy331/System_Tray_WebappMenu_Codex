@@ -58,6 +58,11 @@ public partial class MainWindow : Window
         if (existing is not null) { ActivateTab(existing); return; }
         var definition = _apps.FirstOrDefault(a => a.Id == id);
         if (definition is null) return;
+        if (!string.IsNullOrEmpty(definition.PinHash))
+        {
+            var pinPrompt = new PinPromptWindow(definition.PinHash, definition.Name) { Owner = this };
+            if (pinPrompt.ShowDialog() != true) return;
+        }
 
         WebView2 browser;
         try

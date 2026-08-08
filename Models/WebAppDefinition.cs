@@ -6,4 +6,5 @@ public sealed class WebAppDefinition
     public string Name { get; set; } = "New app";
     public string Url { get; set; } = "https://example.com";
     public string? IconPath { get; set; }
+    public string? PinHash { get; set; }
 }

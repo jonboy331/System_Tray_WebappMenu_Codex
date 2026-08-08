@@ -22,8 +22,12 @@ public partial class WidgetWindow : Window
 
         Width = Math.Max(60, settings.WidgetWidth);
         Height = Math.Max(32, settings.WidgetHeight);
-        WidgetLabel.Text = settings.WidgetText;
 
+        var hasText = !string.IsNullOrWhiteSpace(settings.WidgetText);
+        WidgetLabel.Text = settings.WidgetText;
+        WidgetLabel.Visibility = hasText ? Visibility.Visible : Visibility.Collapsed;
+
+        var hasImage = false;
         if (!string.IsNullOrWhiteSpace(settings.WidgetImagePath) && File.Exists(settings.WidgetImagePath))
         {
             try
@@ -35,8 +39,22 @@ public partial class WidgetWindow : Window
                 bitmap.EndInit();
                 WidgetImage.Source = bitmap;
                 WidgetImage.Visibility = Visibility.Visible;
+                hasImage = true;
             }
             catch { /* fall back to text-only widget */ }
+        }
+
+        if (hasImage)
+        {
+            ImageRow.Height = new GridLength(1, GridUnitType.Star);
+            TextRow.Height = hasText ? GridLength.Auto : new GridLength(0);
+            WidgetLabel.FontSize = 10;
+            WidgetLabel.Margin = new Thickness(0, 2, 0, 0);
+        }
+        else
+        {
+            ImageRow.Height = new GridLength(0);
+            TextRow.Height = new GridLength(1, GridUnitType.Star);
         }
 
         var workArea = SystemParameters.WorkArea;

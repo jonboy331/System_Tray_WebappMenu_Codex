@@ -5,10 +5,14 @@
         Background="Transparent" Topmost="True" ShowInTaskbar="False" Icon="Assets/AppIcon.ico"
         MouseLeftButtonDown="Widget_MouseLeftButtonDown">
   <Border x:Name="WidgetBorder" CornerRadius="10" Background="#26372F" BorderBrush="#3A4A40" BorderThickness="1" ClipToBounds="True">
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8">
-      <Image x:Name="WidgetImage" Stretch="Uniform" MaxHeight="64" HorizontalAlignment="Center" Margin="0,0,0,6" Visibility="Collapsed" />
-      <TextBlock x:Name="WidgetLabel" Foreground="{DynamicResource Ink}" FontWeight="SemiBold" FontSize="14"
-                 HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" TextAlignment="Center" TextWrapping="Wrap" />
-    </StackPanel>
+    <Grid Margin="8">
+      <Grid.RowDefinitions>
+        <RowDefinition x:Name="ImageRow" Height="*" />
+        <RowDefinition x:Name="TextRow" Height="Auto" />
+      </Grid.RowDefinitions>
+      <Image x:Name="WidgetImage" Grid.Row="0" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+      <TextBlock x:Name="WidgetLabel" Grid.Row="1" Foreground="{DynamicResource Ink}" FontWeight="SemiBold" FontSize="14"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextAlignment="Center" TextWrapping="Wrap" />
+    </Grid>
   </Border>
 </Window>

@@ -243,6 +243,7 @@ public partial class SettingsWindow : Window
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.ColumnDefinitions.Add(new ColumnDefinition());
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             var loadedIcon = TryLoadIcon(app);
             FrameworkElement icon = loadedIcon is not null ? (FrameworkElement)loadedIcon : BuildFallbackIcon(app);
@@ -257,12 +258,26 @@ public partial class SettingsWindow : Window
             changeIcon.Click += ChangeIcon_Click;
             Grid.SetColumn(changeIcon, 2);
 
-            row.Children.Add(icon); row.Children.Add(textStack); row.Children.Add(changeIcon);
+            var setPin = new Button { Content = string.IsNullOrEmpty(app.PinHash) ? "Set PIN" : "PIN set ✓", Tag = app, FontSize = 11, Margin = new Thickness(6, 0, 0, 0) };
+            setPin.Click += SetPin_Click;
+            Grid.SetColumn(setPin, 3);
+
+            row.Children.Add(icon); row.Children.Add(textStack); row.Children.Add(changeIcon); row.Children.Add(setPin);
             AppsListPanel.Children.Add(row);
         }
 
         if (_apps.Count == 0)
             AppsListPanel.Children.Add(new TextBlock { Text = "No web apps yet.", Foreground = (Brush)FindResource("MutedInk"), Margin = new Thickness(0, 4, 0, 4) });
+    }
+
+    private void SetPin_Click(object sender, RoutedEventArgs e)
+    {
+        var app = (WebAppDefinition)((Button)sender).Tag;
+        var dialog = new SetPinWindow(app.Name) { Owner = this };
+        if (dialog.ShowDialog() != true) return;
+        app.PinHash = dialog.RemovePin ? null : PasswordService.Hash(dialog.EnteredPin);
+        _store.Save(_apps);
+        RenderAppsList();
     }
 
     private void ChangeIcon_Click(object sender, RoutedEventArgs e)
