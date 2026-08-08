@@ -80,10 +80,10 @@
                 <TextBlock Text="WEB APPS" Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="Bold" />
                 <TextBlock Text="Launch menu" Foreground="{StaticResource Ink}" FontSize="22" FontWeight="SemiBold" Margin="0,4,0,14" />
               </StackPanel>
-              <Button x:Name="AppListScrollUpButton" Grid.Column="1" Click="AppListScrollUp_Click" ToolTip="Scroll up" Width="40" Height="40" Padding="0" Margin="0,0,8,0" VerticalAlignment="Top" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Visibility="Collapsed">
+              <Button Grid.Column="1" Click="CloseDrawer_Click" Content="×" FontSize="20" VerticalAlignment="Top" Margin="0,0,8,0" />
+              <Button x:Name="AppListScrollUpButton" Grid.Column="2" Click="AppListScrollUp_Click" ToolTip="Scroll up" Width="40" Height="40" Padding="0" VerticalAlignment="Top" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Visibility="Collapsed">
                 <TextBlock Text="▲" FontSize="14" />
               </Button>
-              <Button Grid.Column="2" Click="CloseDrawer_Click" Content="×" FontSize="20" VerticalAlignment="Top" />
             </Grid>
             <ScrollViewer x:Name="AppListScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Hidden" ScrollChanged="AppListScrollViewer_ScrollChanged">
               <StackPanel x:Name="AppListPanel" />
@@ -100,14 +100,14 @@
                   <TextBlock Text="Settings" FontWeight="SemiBold" />
                 </StackPanel>
               </Button>
-              <Button x:Name="AppListScrollDownButton" Grid.Column="1" Click="AppListScrollDown_Click" ToolTip="Scroll down" Width="40" Height="40" Padding="0" Margin="8,0,0,0" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Visibility="Collapsed">
-                <TextBlock Text="▼" FontSize="14" />
-              </Button>
-              <Button x:Name="KioskCloseButton" Grid.Column="2" Click="KioskClose_Click" Background="#351F27" Margin="8,0,0,0" Visibility="Collapsed">
+              <Button x:Name="KioskCloseButton" Grid.Column="1" Click="KioskClose_Click" Background="#351F27" Margin="8,0,0,0" Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal">
                   <TextBlock Text="×" FontSize="15" Margin="0,0,6,0" />
                   <TextBlock Text="Close" FontWeight="SemiBold" />
                 </StackPanel>
+              </Button>
+              <Button x:Name="AppListScrollDownButton" Grid.Column="2" Click="AppListScrollDown_Click" ToolTip="Scroll down" Width="40" Height="40" Padding="0" Margin="8,0,0,0" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Visibility="Collapsed">
+                <TextBlock Text="▼" FontSize="14" />
               </Button>
             </Grid>
           </Grid>
