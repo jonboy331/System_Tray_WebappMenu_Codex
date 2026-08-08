@@ -28,19 +28,19 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
-          <Button x:Name="AppsButton" Click="AppsButton_Click" Background="#26372F" Padding="14,8" ToolTip="Web app menu">
+          <Button x:Name="AppsButton" Click="AppsButton_Click" Background="#26372F" Padding="14,8" ToolTip="Web app menu" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
             <StackPanel Orientation="Horizontal"><TextBlock Text="●" Foreground="{DynamicResource Accent}" FontSize="12" Margin="0,0,8,0"/><TextBlock Text="Apps" FontWeight="SemiBold" /></StackPanel>
           </Button>
           <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Margin="10,0">
             <StackPanel x:Name="TabsPanel" Orientation="Horizontal" VerticalAlignment="Center" />
           </ScrollViewer>
           <StackPanel x:Name="WindowControlsPanel" Grid.Column="2" Orientation="Horizontal">
-            <Button Click="FullScreen_Click" ToolTip="Toggle full screen"><TextBlock x:Name="FullScreenGlyph" Text="□" FontSize="18" /></Button>
-            <Button Click="Minimize_Click" ToolTip="Minimize to tray"><TextBlock Text="—" FontSize="18" /></Button>
-            <Button Click="Hide_Click" ToolTip="Hide to tray" Background="#351F27"><TextBlock Text="×" FontSize="20" /></Button>
+            <Button Click="FullScreen_Click" ToolTip="Toggle full screen" Width="40" Height="40" Padding="0" BorderBrush="{DynamicResource Accent}" BorderThickness="1"><TextBlock x:Name="FullScreenGlyph" Text="□" FontSize="18" /></Button>
+            <Button Click="Minimize_Click" ToolTip="Minimize to tray" Width="40" Height="40" Padding="0" Margin="6,0,0,0" BorderBrush="{DynamicResource Accent}" BorderThickness="1"><TextBlock Text="—" FontSize="18" /></Button>
+            <Button Click="Hide_Click" ToolTip="Hide to tray" Background="#351F27" Width="40" Height="40" Padding="0" Margin="6,0,0,0" BorderBrush="{DynamicResource Accent}" BorderThickness="1"><TextBlock Text="×" FontSize="20" /></Button>
           </StackPanel>
           <StackPanel x:Name="WidgetControlsPanel" Grid.Column="2" Orientation="Horizontal" Visibility="Collapsed">
-            <Button Click="MinimizeToWidget_Click" ToolTip="Minimize to floating widget"><TextBlock Text="—" FontSize="18" /></Button>
+            <Button Click="MinimizeToWidget_Click" ToolTip="Minimize to floating widget" Width="40" Height="40" Padding="0" BorderBrush="{DynamicResource Accent}" BorderThickness="1"><TextBlock Text="—" FontSize="18" /></Button>
           </StackPanel>
         </Grid>
       </Border>
@@ -98,11 +98,11 @@
       <Border Grid.Row="3" Background="{StaticResource Panel}" BorderBrush="#252D3A" BorderThickness="0,1,0,0">
         <Grid Margin="12,0">
           <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-            <Button x:Name="BackButton" Click="Back_Click" IsEnabled="False" Margin="0,0,8,0"><StackPanel Orientation="Horizontal"><TextBlock Text="←" FontSize="19" Margin="0,0,8,0"/><TextBlock Text="Back" /></StackPanel></Button>
-            <Button x:Name="ReloadButton" Click="Reload_Click" IsEnabled="False" ToolTip="Reload"><TextBlock Text="↻" FontSize="18" /></Button>
+            <Button x:Name="BackButton" Click="Back_Click" IsEnabled="False" Margin="0,0,8,0" BorderBrush="{DynamicResource Accent}" BorderThickness="1"><StackPanel Orientation="Horizontal"><TextBlock Text="←" FontSize="19" Margin="0,0,8,0"/><TextBlock Text="Back" /></StackPanel></Button>
+            <Button x:Name="ReloadButton" Click="Reload_Click" IsEnabled="False" ToolTip="Reload" BorderBrush="{DynamicResource Accent}" BorderThickness="1"><StackPanel Orientation="Horizontal"><TextBlock Text="↻" FontSize="18" Margin="0,0,8,0"/><TextBlock Text="Reload" /></StackPanel></Button>
           </StackPanel>
           <TextBlock x:Name="StatusText" Text="No app open" Foreground="{StaticResource MutedInk}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-          <Button x:Name="CloseTabButton" Click="CloseTab_Click" IsEnabled="False" Background="#351F27" HorizontalAlignment="Right" VerticalAlignment="Center">
+          <Button x:Name="CloseTabButton" Click="CloseTab_Click" IsEnabled="False" Background="#351F27" HorizontalAlignment="Right" VerticalAlignment="Center" BorderBrush="{DynamicResource Accent}" BorderThickness="1">
             <StackPanel Orientation="Horizontal"><TextBlock Text="×" FontSize="18" Margin="0,0,8,0"/><TextBlock Text="Close current" /></StackPanel>
           </Button>
         </Grid>
